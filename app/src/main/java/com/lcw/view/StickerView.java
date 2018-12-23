@@ -36,10 +36,11 @@ public class StickerView extends View implements View.OnTouchListener {
     private boolean mCanScale;//标志是否可缩放
     private boolean mCanRotate;//标志是否可旋转
 
+    private float mLastDistance;//记录上一次双指之间的距离
     private PointF mBitmapMidPoint = new PointF();//记录图片中心点
     private PointF mLastSinglePoint = new PointF();//记录单指触摸屏幕的点坐标
-    private PointF mLastPoint = new PointF();//记录上一次多指触摸屏幕的点坐标
-    private PointF mCurrentPoint = new PointF();//记录当前多指触摸屏幕的点坐标
+    private PointF mLastDoublePoint = new PointF();//记录上一次双指触摸屏幕的点坐标
+    private PointF mCurrentDoublePoint = new PointF();//记录当前双指触摸屏幕的点坐标
 
     private Paint mPaint;
 
@@ -107,7 +108,6 @@ public class StickerView extends View implements View.OnTouchListener {
         canvas.drawBitmap(mBitmap, mMatrix, null);
     }
 
-    private float mLastDistance;
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -116,19 +116,21 @@ public class StickerView extends View implements View.OnTouchListener {
             case MotionEvent.ACTION_DOWN:
                 mLastSinglePoint.set(event.getX(), event.getY());
                 if (isInStickerView(mLastSinglePoint)) {
+                    //触摸点是否在贴纸范围内
                     mCanTranslate = true;
                 }
                 mCanScale = false;
                 mCanRotate = false;
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
-                mCanTranslate = false;
                 if (event.getPointerCount() == 2) {
+                    mCanTranslate = false;
                     mCanScale = true;
                     mCanRotate = true;
-                    mLastPoint.set(event.getX(0) - event.getX(1), event.getY(0) - event.getY(1));
-
-                    mLastDistance = calculateDistance(new PointF(event.getX(0), event.getY(0)), new PointF(event.getX(1), event.getY(1)));
+                    //计算双指之间向量
+                    mLastDoublePoint.set(event.getX(0) - event.getX(1), event.getY(0) - event.getY(1));
+                    //计算双指之间距离
+                    mLastDistance = calculateDistance(event);
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -136,20 +138,17 @@ public class StickerView extends View implements View.OnTouchListener {
                     translate(event.getX() - mLastSinglePoint.x, event.getY() - mLastSinglePoint.y);
                     mLastSinglePoint.set(event.getX(), event.getY());
                 }
-                if (mCanScale) {
-                    if (event.getPointerCount() == 2) {
-                        float distance = calculateDistance(new PointF(event.getX(0), event.getY(0)), new PointF(event.getX(1), event.getY(1)));
-                        float scale = distance / mLastDistance;
-                        scale(scale, scale, getBitmapMidPoint().x, getBitmapMidPoint().y);
-                        mLastDistance = distance;
-                    }
-                }
-                if (mCanRotate) {
-                    if (event.getPointerCount() == 2) {
-                        mCurrentPoint.set(event.getX(0) - event.getX(1), event.getY(0) - event.getY(1));
-                        rotate(calculateDegrees(mLastPoint, mCurrentPoint), getBitmapMidPoint().x, getBitmapMidPoint().y);
-                        mLastPoint.set(mCurrentPoint.x, mCurrentPoint.y);
-                    }
+                if ((mCanScale || mCanRotate) && event.getPointerCount() == 2) {
+                    //操作自由缩放
+                    float distance = calculateDistance(event);
+                    //根据双指移动的距离获取缩放因子
+                    float scale = distance / mLastDistance;
+                    scale(scale, scale, getBitmapMidPoint().x, getBitmapMidPoint().y);
+                    mLastDistance = distance;
+                    //操作自由旋转
+                    mCurrentDoublePoint.set(event.getX(0) - event.getX(1), event.getY(0) - event.getY(1));
+                    rotate(calculateDegrees(mLastDoublePoint, mCurrentDoublePoint), getBitmapMidPoint().x, getBitmapMidPoint().y);
+                    mLastDoublePoint.set(mCurrentDoublePoint.x, mCurrentDoublePoint.y);
                 }
                 break;
             case MotionEvent.ACTION_UP:
@@ -170,7 +169,7 @@ public class StickerView extends View implements View.OnTouchListener {
      */
     private void translate(float dx, float dy) {
         mMatrix.postTranslate(dx, dy);
-        transform();
+        mMatrix.mapPoints(mDstPoints, mScrPoints);
     }
 
     /**
@@ -183,7 +182,7 @@ public class StickerView extends View implements View.OnTouchListener {
      */
     private void scale(float sx, float sy, float px, float py) {
         mMatrix.postScale(sx, sy, px, py);
-        transform();
+        mMatrix.mapPoints(mDstPoints, mScrPoints);
     }
 
     /**
@@ -195,13 +194,6 @@ public class StickerView extends View implements View.OnTouchListener {
      */
     private void rotate(float degrees, float px, float py) {
         mMatrix.postRotate(degrees, px, py);
-        transform();
-    }
-
-    /**
-     * 通过矩阵的变化，更改记录点坐标的位置
-     */
-    private void transform() {
         mMatrix.mapPoints(mDstPoints, mScrPoints);
     }
 
@@ -232,9 +224,9 @@ public class StickerView extends View implements View.OnTouchListener {
     /**
      * 计算两点之间的距离
      */
-    private float calculateDistance(PointF pointF1, PointF pointF2) {
-        float x = pointF2.x - pointF1.x;
-        float y = pointF2.y - pointF1.y;
+    private float calculateDistance(MotionEvent event) {
+        float x = event.getX(0) - event.getX(1);
+        float y = event.getY(0) - event.getY(1);
         return (float) Math.sqrt(x * x + y * y);
     }
 
