@@ -37,10 +37,10 @@ public class StickerView extends View implements View.OnTouchListener {
     private boolean mCanRotate;//标志是否可旋转
 
     private float mLastDistance;//记录上一次双指之间的距离
-    private PointF mBitmapMidPoint = new PointF();//记录图片中心点
-    private PointF mLastSinglePoint = new PointF();//记录单指触摸屏幕的点坐标
-    private PointF mLastDoublePoint = new PointF();//记录上一次双指触摸屏幕的点坐标
-    private PointF mCurrentDoublePoint = new PointF();//记录当前双指触摸屏幕的点坐标
+    private PointF mMidPoint = new PointF();//记录图片中心点
+    private PointF mLastSinglePoint = new PointF();//记录上一次单指触摸屏幕的点坐标
+    private PointF mLastDistancePoint = new PointF();//记录上一次双指触摸屏幕的点坐标
+    private PointF mDistancePoint = new PointF();//记录当前双指触摸屏幕的点坐标
 
     private Paint mPaint;
 
@@ -115,7 +115,7 @@ public class StickerView extends View implements View.OnTouchListener {
         switch (action & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 mLastSinglePoint.set(event.getX(), event.getY());
-                if (isInStickerView(mLastSinglePoint)) {
+                if (isInStickerView(event)) {
                     //触摸点是否在贴纸范围内
                     mCanTranslate = true;
                 }
@@ -123,12 +123,12 @@ public class StickerView extends View implements View.OnTouchListener {
                 mCanRotate = false;
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
-                if (event.getPointerCount() == 2) {
+                if (event.getPointerCount() == 2 && isInStickerView(event)) {
                     mCanTranslate = false;
                     mCanScale = true;
                     mCanRotate = true;
                     //计算双指之间向量
-                    mLastDoublePoint.set(event.getX(0) - event.getX(1), event.getY(0) - event.getY(1));
+                    mLastDistancePoint.set(event.getX(0) - event.getX(1), event.getY(0) - event.getY(1));
                     //计算双指之间距离
                     mLastDistance = calculateDistance(event);
                 }
@@ -143,18 +143,16 @@ public class StickerView extends View implements View.OnTouchListener {
                     float distance = calculateDistance(event);
                     //根据双指移动的距离获取缩放因子
                     float scale = distance / mLastDistance;
-                    scale(scale, scale, getBitmapMidPoint().x, getBitmapMidPoint().y);
+                    scale(scale, scale, getMidPoint().x, getMidPoint().y);
                     mLastDistance = distance;
                     //操作自由旋转
-                    mCurrentDoublePoint.set(event.getX(0) - event.getX(1), event.getY(0) - event.getY(1));
-                    rotate(calculateDegrees(mLastDoublePoint, mCurrentDoublePoint), getBitmapMidPoint().x, getBitmapMidPoint().y);
-                    mLastDoublePoint.set(mCurrentDoublePoint.x, mCurrentDoublePoint.y);
+                    mDistancePoint.set(event.getX(0) - event.getX(1), event.getY(0) - event.getY(1));
+                    rotate(calculateDegrees(mLastDistancePoint, mDistancePoint), getMidPoint().x, getMidPoint().y);
+                    mLastDistancePoint.set(mDistancePoint.x, mDistancePoint.y);
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                mCanTranslate = false;
-                mCanScale = false;
-                mCanRotate = false;
+                reset();
                 break;
         }
         invalidate();
@@ -197,28 +195,47 @@ public class StickerView extends View implements View.OnTouchListener {
         mMatrix.mapPoints(mDstPoints, mScrPoints);
     }
 
+
     /**
      * 检测当前触摸是否在贴纸上
      *
      * @return
      */
-    private boolean isInStickerView(PointF pointF) {
-        float[] dstPoints = new float[2];
-        float[] srcPoints = new float[]{pointF.x, pointF.y};
-        Matrix matrix = new Matrix();
-        mMatrix.invert(matrix);
-        matrix.mapPoints(dstPoints, srcPoints);
-        return mBitmapBound.contains(dstPoints[0], dstPoints[1]);
+    private boolean isInStickerView(MotionEvent motionEvent) {
+
+        if (motionEvent.getPointerCount() == 1) {
+            float[] dstPoints = new float[2];
+            float[] srcPoints = new float[]{motionEvent.getX(), motionEvent.getY()};
+            Matrix matrix = new Matrix();
+            mMatrix.invert(matrix);
+            matrix.mapPoints(dstPoints, srcPoints);
+            if (mBitmapBound.contains(dstPoints[0], dstPoints[1])) {
+                return true;
+            }
+        }
+
+        if (motionEvent.getPointerCount() == 2) {
+            float[] dstPoints = new float[4];
+            float[] srcPoints = new float[]{motionEvent.getX(0), motionEvent.getY(0), motionEvent.getX(1), motionEvent.getY(1)};
+            Matrix matrix = new Matrix();
+            mMatrix.invert(matrix);
+            matrix.mapPoints(dstPoints, srcPoints);
+            if (mBitmapBound.contains(dstPoints[0], dstPoints[1]) || mBitmapBound.contains(dstPoints[2], dstPoints[3])) {
+                return true;
+            }
+        }
+        return false;
     }
+
 
     /**
      * 获取图像中心点
      *
      * @return
      */
-    private PointF getBitmapMidPoint() {
-        mBitmapMidPoint.set(mDstPoints[8], mDstPoints[9]);
-        return mBitmapMidPoint;
+    private PointF getMidPoint() {
+        mMidPoint.set(mDstPoints[8], mDstPoints[9]);
+        return mMidPoint;
     }
 
     /**
@@ -229,6 +246,7 @@ public class StickerView extends View implements View.OnTouchListener {
         float y = event.getY(0) - event.getY(1);
         return (float) Math.sqrt(x * x + y * y);
     }
+    
 
     /**
      * 计算旋转角度
@@ -241,6 +259,20 @@ public class StickerView extends View implements View.OnTouchListener {
         float lastDegrees = (float) Math.atan2(lastPoint.y, lastPoint.x);
         float currentDegrees = (float) Math.atan2(pointF.y, pointF.x);
         return (float) Math.toDegrees(currentDegrees - lastDegrees);
+    }
+
+    /**
+     * 重置状态
+     */
+    private void reset() {
+        mCanTranslate = false;
+        mCanScale = false;
+        mCanRotate = false;
+        mLastDistance = 0f;
+        mMidPoint.set(0f, 0f);
+        mLastSinglePoint.set(0f, 0f);
+        mLastDistancePoint.set(0f, 0f);
+        mDistancePoint.set(0f, 0f);
     }
 
 }
