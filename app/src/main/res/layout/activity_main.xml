@@ -5,9 +5,57 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.lcw.view.StickerView
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@mipmap/background" />
+
+    <com.lcw.view.test.StickerLayout
+        android:id="@+id/sl_sticker_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:id="@+id/ll_main_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/iv_sticker_01"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:scaleType="centerInside"
+            android:src="@mipmap/sticker_01" />
+
+        <ImageView
+            android:id="@+id/iv_sticker_02"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:scaleType="centerInside"
+            android:src="@mipmap/sticker_02" />
+
+        <ImageView
+            android:id="@+id/iv_sticker_03"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:scaleType="centerInside"
+            android:src="@mipmap/sticker_03" />
+
+        <ImageView
+            android:id="@+id/iv_sticker_04"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:scaleType="centerInside"
+            android:src="@mipmap/sticker_04" />
+    </LinearLayout>
 
 
 </RelativeLayout>

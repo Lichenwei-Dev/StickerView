@@ -16,6 +16,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.lcw.view.R;
+
 /**
  * 自定义贴纸View
  * Create by: chenWei.li
@@ -89,12 +91,12 @@ public class StickerView extends View implements View.OnTouchListener {
         mMatrix = new Matrix();
 
         //移动图像到屏幕中心
-        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        windowManager.getDefaultDisplay().getMetrics(displayMetrics);
-        float dx = displayMetrics.widthPixels / 2 - mBitmap.getWidth() / 2;
-        float dy = displayMetrics.heightPixels / 2 - mBitmap.getHeight() / 2;
-        translate(dx, dy);
+//        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+//        DisplayMetrics displayMetrics = new DisplayMetrics();
+//        windowManager.getDefaultDisplay().getMetrics(displayMetrics);
+//        float dx = displayMetrics.widthPixels / 2 - mBitmap.getWidth() / 2;
+//        float dy = displayMetrics.heightPixels / 2 - mBitmap.getHeight() / 2;
+//        translate(dx, dy);
 
         //设置触摸监听
         setOnTouchListener(this);
