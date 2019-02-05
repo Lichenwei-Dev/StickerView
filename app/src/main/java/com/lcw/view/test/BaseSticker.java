@@ -14,41 +14,41 @@ import android.graphics.RectF;
  */
 public abstract class BaseSticker implements ISupportOperation {
 
-    protected Bitmap bitmap;//贴纸图片
+    protected Bitmap mBitmap;//贴纸图像
     protected Matrix matrix;//维护图像变化的矩阵
-    private int mode;
+    private int mode;//当前模式
 
-    protected float[] mScrPoints;//矩阵变换前的点坐标
+    protected float[] mSrcPoints;//矩阵变换前的点坐标
     protected float[] mDstPoints;//矩阵变换后的点坐标
-    protected RectF mBitmapBound;//图片范围的点坐标
-    protected PointF mMidPointF = new PointF();
+    protected RectF mBitmapBound;//贴纸范围
+    protected PointF mMidPointF = new PointF();//贴纸中心的点坐标
 
 
     public static final int MODE_SINGLE = 1;//标志是否可移动
     public static final int MODE_MULTIPLE = 2;//标志是否可缩放，旋转
 
     public BaseSticker(Bitmap bitmap) {
-        this.bitmap = bitmap;
+        this.mBitmap = bitmap;
         matrix = new Matrix();
 
-        mScrPoints = new float[]{
+        mSrcPoints = new float[]{
                 0, 0,//左上
                 bitmap.getWidth(), 0,//右上
                 bitmap.getWidth(), bitmap.getHeight(),//右下
                 0, bitmap.getHeight(),//左下
                 bitmap.getWidth() / 2, bitmap.getHeight() / 2//中间点
         };
-        mDstPoints = mScrPoints.clone();
+        mDstPoints = mSrcPoints.clone();
         mBitmapBound = new RectF(0, 0, bitmap.getWidth(), bitmap.getHeight());
 
     }
 
-    public int getMode() {
-        return mode;
-    }
-
     public void setMode(int mode) {
         this.mode = mode;
+    }
+
+    public int getMode() {
+        return mode;
     }
 
     public Matrix getMatrix() {

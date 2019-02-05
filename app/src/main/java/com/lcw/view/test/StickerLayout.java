@@ -21,10 +21,12 @@ import java.util.List;
  */
 public class StickerLayout extends View implements View.OnTouchListener {
 
+    //画笔
     private Paint mPaint;
 
     //记录当前操作的贴纸对象
     private Sticker mStick;
+
     //记录点坐标，减少对象在onTouch中的创建
     private PointF mFirstPoint = new PointF();
     private PointF mSecondPoint = new PointF();
@@ -32,25 +34,23 @@ public class StickerLayout extends View implements View.OnTouchListener {
 
     public StickerLayout(Context context) {
         super(context);
-        init(context);
+        init();
     }
 
     public StickerLayout(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init(context);
+        init();
     }
 
     public StickerLayout(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context);
+        init();
     }
 
     /**
      * 初始化操作
-     *
-     * @param context
      */
-    private void init(Context context) {
+    private void init() {
 
         //初始化画笔
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -73,9 +73,10 @@ public class StickerLayout extends View implements View.OnTouchListener {
 
     /**
      * 移除贴纸
+     *
      * @param sticker
      */
-    public void removeSticker(Sticker sticker){
+    public void removeSticker(Sticker sticker) {
         StickerManager.getInstance().removeSticker(sticker);
         invalidate();
     }
@@ -83,7 +84,7 @@ public class StickerLayout extends View implements View.OnTouchListener {
     /**
      * 清空贴纸
      */
-    public void clear(){
+    public void removeAllSticker() {
         StickerManager.getInstance().removeAllSticker();
         invalidate();
     }
@@ -96,9 +97,7 @@ public class StickerLayout extends View implements View.OnTouchListener {
             Sticker sticker = stickerList.get(i);
             sticker.onDraw(canvas, mPaint);
         }
-
     }
-
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -109,7 +108,7 @@ public class StickerLayout extends View implements View.OnTouchListener {
                 if (mStick != null) {
                     //有触摸到贴纸
                     mStick.setMode(Sticker.MODE_SINGLE);
-                    mStick.setLastSinglePoint(event.getX(), event.getY());
+                    mStick.mLastSinglePoint.set(event.getX(), event.getY());
                 }
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
@@ -119,7 +118,7 @@ public class StickerLayout extends View implements View.OnTouchListener {
                     mFirstPoint.set(event.getX(0), event.getY(0));
                     mSecondPoint.set(event.getX(1), event.getY(1));
                     //计算双指之间向量
-                    mStick.setLastDistanceVector(mFirstPoint.x - mSecondPoint.x, mFirstPoint.y - mSecondPoint.y);
+                    mStick.mLastDistanceVector.set(mFirstPoint.x - mSecondPoint.x, mFirstPoint.y - mSecondPoint.y);
                     //计算双指之间距离
                     mStick.mLastDistance = mStick.calculateDistance(mFirstPoint, mSecondPoint);
                 }
@@ -127,8 +126,8 @@ public class StickerLayout extends View implements View.OnTouchListener {
             case MotionEvent.ACTION_MOVE:
                 if (mStick != null) {
                     if (mStick.getMode() == Sticker.MODE_SINGLE) {
-                        mStick.translate(event.getX() - mStick.getLastSinglePoint().x, event.getY() - mStick.getLastSinglePoint().y);
-                        mStick.getLastSinglePoint().set(event.getX(), event.getY());
+                        mStick.translate(event.getX() - mStick.mLastSinglePoint.x, event.getY() - mStick.mLastSinglePoint.y);
+                        mStick.mLastSinglePoint.set(event.getX(), event.getY());
                     }
 
                     if (mStick.getMode() == Sticker.MODE_MULTIPLE && event.getPointerCount() == 2) {
@@ -142,9 +141,9 @@ public class StickerLayout extends View implements View.OnTouchListener {
                         mStick.scale(scale, scale, mStick.getMidPoint().x, mStick.getMidPoint().y);
                         mStick.mLastDistance = distance;
                         //操作自由旋转
-                        mStick.setDistanceVector(mFirstPoint.x - mSecondPoint.x, mFirstPoint.y - mSecondPoint.y);
-                        mStick.rotate(mStick.calculateDegrees(mStick.getLastDistanceVector(), mStick.getDistanceVector()), mStick.getMidPoint().x, mStick.getMidPoint().y);
-                        mStick.setLastDistanceVector(mStick.getDistanceVector().x, mStick.getDistanceVector().y);
+                        mStick.mDistanceVector.set(mFirstPoint.x - mSecondPoint.x, mFirstPoint.y - mSecondPoint.y);
+                        mStick.rotate(mStick.calculateDegrees(mStick.mLastDistanceVector, mStick.mDistanceVector), mStick.getMidPoint().x, mStick.getMidPoint().y);
+                        mStick.mLastDistanceVector.set(mStick.mDistanceVector.x, mStick.mDistanceVector.y);
                     }
                 }
                 break;

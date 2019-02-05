@@ -25,6 +25,10 @@ import com.lcw.view.R;
  * Time: 下午11:02
  * Email: lichenwei.me@foxmail.com
  */
+
+/**
+ * @Deprecated 基础贴纸类，废弃不再使用
+ */
 public class StickerView extends View implements View.OnTouchListener {
 
     private Bitmap mBitmap;//贴纸图片
@@ -248,7 +252,7 @@ public class StickerView extends View implements View.OnTouchListener {
         float y = event.getY(0) - event.getY(1);
         return (float) Math.sqrt(x * x + y * y);
     }
-    
+
 
     /**
      * 计算旋转角度
