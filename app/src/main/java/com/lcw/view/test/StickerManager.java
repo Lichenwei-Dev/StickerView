@@ -1,5 +1,6 @@
 package com.lcw.view.test;
 
+import android.graphics.Bitmap;
 import android.graphics.Matrix;
 
 import java.util.ArrayList;
@@ -38,10 +39,21 @@ public class StickerManager {
     }
 
     public void removeSticker(Sticker sticker) {
+        Bitmap bitmap = sticker.getBitmap();
+        if (bitmap != null && bitmap.isRecycled()) {
+            bitmap.recycle();
+        }
         mStickerList.remove(sticker);
+
     }
 
     public void removeAllSticker() {
+        for (int i = 0; i < mStickerList.size(); i++) {
+            Bitmap bitmap = mStickerList.get(i).getBitmap();
+            if (bitmap != null && bitmap.isRecycled()) {
+                bitmap.recycle();
+            }
+        }
         mStickerList.clear();
     }
 
@@ -62,10 +74,37 @@ public class StickerManager {
             Matrix matrix = new Matrix();
             sticker.getMatrix().invert(matrix);
             matrix.mapPoints(dstPoints, srcPoints);
-            if (sticker.getBitmapBound().contains(dstPoints[0], dstPoints[1])) {
+            if (sticker.getStickerBitmapBound().contains(dstPoints[0], dstPoints[1])) {
                 return sticker;
             }
         }
         return null;
     }
+
+    /**
+     * 根据触摸坐标返回当前触摸的贴纸(是否触摸到删除按钮)
+     *
+     * @param x
+     * @param y
+     * @return
+     */
+    public Sticker getDelButton(float x, float y) {
+
+        float[] dstPoints = new float[2];
+        float[] srcPoints = new float[]{x, y};
+
+        for (int i = mStickerList.size() - 1; i >= 0; i--) {
+            Sticker sticker = mStickerList.get(i);
+            Matrix matrix = new Matrix();
+            sticker.getMatrix().invert(matrix);
+            matrix.mapPoints(dstPoints, srcPoints);
+            if (sticker.getDelBitmapBound().contains(dstPoints[0], dstPoints[1])) {
+                return sticker;
+            }
+        }
+        return null;
+
+    }
+
+
 }

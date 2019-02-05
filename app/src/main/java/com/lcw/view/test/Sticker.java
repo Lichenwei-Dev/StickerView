@@ -1,9 +1,10 @@
 package com.lcw.view.test;
 
+import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
+import android.graphics.Matrix;
 import android.graphics.PointF;
+import android.util.Log;
 
 /**
  * 贴纸类（处理手势动作以及其他业务逻辑）
@@ -19,8 +20,8 @@ public class Sticker extends BaseSticker {
     protected PointF mDistanceVector = new PointF();//记录当前双指之间的向量
     protected float mLastDistance;//记录上一次双指之间的距离
 
-    public Sticker(Bitmap bitmap) {
-        super(bitmap);
+    public Sticker(Context context, Bitmap bitmap) {
+        super(context, bitmap);
     }
 
     /**
@@ -60,11 +61,6 @@ public class Sticker extends BaseSticker {
     public void rotate(float degrees, float px, float py) {
         matrix.postRotate(degrees, px, py);
         updatePoints();
-    }
-
-    @Override
-    public void onDraw(Canvas canvas, Paint paint) {
-        canvas.drawBitmap(mBitmap, matrix, paint);
     }
 
     /**

@@ -7,8 +7,12 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TabHost;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -20,6 +24,8 @@ import java.util.List;
  * Email: lichenwei.me@foxmail.com
  */
 public class StickerLayout extends View implements View.OnTouchListener {
+
+    private Context mContext;
 
     //画笔
     private Paint mPaint;
@@ -34,31 +40,29 @@ public class StickerLayout extends View implements View.OnTouchListener {
 
     public StickerLayout(Context context) {
         super(context);
-        init();
+        init(context);
     }
 
     public StickerLayout(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context);
     }
 
     public StickerLayout(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(context);
     }
 
     /**
      * 初始化操作
      */
-    private void init() {
-
+    private void init(Context context) {
+        this.mContext = context;
         //初始化画笔
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaint.setColor(Color.GRAY);
-
         //设置触摸监听
         setOnTouchListener(this);
-
     }
 
     /**
@@ -67,8 +71,13 @@ public class StickerLayout extends View implements View.OnTouchListener {
      * @param sticker
      */
     public void addSticker(Sticker sticker) {
-        StickerManager.getInstance().addSticker(sticker);
-        invalidate();
+        int size = StickerManager.getInstance().getStickerList().size();
+        if (size < 9) {
+            StickerManager.getInstance().addSticker(sticker);
+            invalidate();
+        } else {
+            Toast.makeText(mContext, "贴纸最大数量不能超过9个", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -104,6 +113,11 @@ public class StickerLayout extends View implements View.OnTouchListener {
         int action = event.getAction();
         switch (action & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
+                mStick = StickerManager.getInstance().getDelButton(event.getX(), event.getY());
+                if (mStick != null) {
+                    removeSticker(mStick);
+                    mStick = null;
+                }
                 mStick = StickerManager.getInstance().getSticker(event.getX(), event.getY());
                 if (mStick != null) {
                     //有触摸到贴纸
@@ -112,15 +126,21 @@ public class StickerLayout extends View implements View.OnTouchListener {
                 }
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
-                if (mStick != null && event.getPointerCount() == 2) {
-                    mStick.setMode(Sticker.MODE_MULTIPLE);
-                    //记录双指的点位置
-                    mFirstPoint.set(event.getX(0), event.getY(0));
-                    mSecondPoint.set(event.getX(1), event.getY(1));
-                    //计算双指之间向量
-                    mStick.mLastDistanceVector.set(mFirstPoint.x - mSecondPoint.x, mFirstPoint.y - mSecondPoint.y);
-                    //计算双指之间距离
-                    mStick.mLastDistance = mStick.calculateDistance(mFirstPoint, mSecondPoint);
+                if (event.getPointerCount() == 2) {
+                    if (mStick == null) {
+                        //处理双指触摸屏幕，第一指没有触摸到贴纸，第二指触摸到贴纸情况
+                        mStick = StickerManager.getInstance().getSticker(event.getX(1), event.getY(1));
+                    }
+                    if (mStick != null) {
+                        mStick.setMode(Sticker.MODE_MULTIPLE);
+                        //记录双指的点位置
+                        mFirstPoint.set(event.getX(0), event.getY(0));
+                        mSecondPoint.set(event.getX(1), event.getY(1));
+                        //计算双指之间向量
+                        mStick.mLastDistanceVector.set(mFirstPoint.x - mSecondPoint.x, mFirstPoint.y - mSecondPoint.y);
+                        //计算双指之间距离
+                        mStick.mLastDistance = mStick.calculateDistance(mFirstPoint, mSecondPoint);
+                    }
                 }
                 break;
             case MotionEvent.ACTION_MOVE:

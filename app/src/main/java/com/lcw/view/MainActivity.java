@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.iv_sticker_01).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Sticker sticker = new Sticker(BitmapFactory.decodeResource(MainActivity.this.getResources(), R.mipmap.sticker_01));
+                Sticker sticker = new Sticker(MainActivity.this, BitmapFactory.decodeResource(MainActivity.this.getResources(), R.mipmap.sticker_01));
                 mStickerLayout.addSticker(sticker);
             }
         });
@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.iv_sticker_02).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Sticker sticker = new Sticker(BitmapFactory.decodeResource(MainActivity.this.getResources(), R.mipmap.sticker_02));
+                Sticker sticker = new Sticker(MainActivity.this,BitmapFactory.decodeResource(MainActivity.this.getResources(), R.mipmap.sticker_02));
                 mStickerLayout.addSticker(sticker);
             }
         });
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.iv_sticker_03).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Sticker sticker = new Sticker(BitmapFactory.decodeResource(MainActivity.this.getResources(), R.mipmap.sticker_03));
+                Sticker sticker = new Sticker(MainActivity.this,BitmapFactory.decodeResource(MainActivity.this.getResources(), R.mipmap.sticker_03));
                 mStickerLayout.addSticker(sticker);
             }
         });
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.iv_sticker_04).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Sticker sticker = new Sticker(BitmapFactory.decodeResource(MainActivity.this.getResources(), R.mipmap.sticker_04));
+                Sticker sticker = new Sticker(MainActivity.this,BitmapFactory.decodeResource(MainActivity.this.getResources(), R.mipmap.sticker_04));
                 mStickerLayout.addSticker(sticker);
             }
         });
