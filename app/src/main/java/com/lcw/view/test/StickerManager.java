@@ -66,7 +66,7 @@ public class StickerManager {
     }
 
     /**
-     * 设置当前贴纸为聚焦贴纸
+     * 设置当前贴纸为焦点贴纸
      *
      * @param focusSticker
      */
@@ -74,10 +74,20 @@ public class StickerManager {
         for (int i = 0; i < mStickerList.size(); i++) {
             Sticker sticker = mStickerList.get(i);
             if (sticker == focusSticker) {
-                sticker.isFocus = true;
+                sticker.setFocus(true);
             } else {
-                sticker.isFocus = false;
+                sticker.setFocus(false);
             }
+        }
+    }
+
+    /**
+     * 清除所有焦点
+     */
+    public void clearAllFocus() {
+        for (int i = 0; i < mStickerList.size(); i++) {
+            Sticker sticker = mStickerList.get(i);
+            sticker.setFocus(false);
         }
     }
 

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PointF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -65,6 +64,7 @@ public class StickerLayout extends View implements View.OnTouchListener {
         int size = StickerManager.getInstance().getStickerList().size();
         if (size < 9) {
             StickerManager.getInstance().addSticker(sticker);
+            StickerManager.getInstance().setFocusSticker(sticker);
             invalidate();
         } else {
             Toast.makeText(mContext, "贴纸最大数量不能超过9个", Toast.LENGTH_SHORT).show();
@@ -77,7 +77,7 @@ public class StickerLayout extends View implements View.OnTouchListener {
      * @param sticker
      */
     public void removeSticker(Sticker sticker) {
-        if (sticker.isFocus) {
+        if (sticker.isFocus()) {
             StickerManager.getInstance().removeSticker(sticker);
             invalidate();
         }
@@ -127,8 +127,10 @@ public class StickerLayout extends View implements View.OnTouchListener {
         }
         if (mStick != null) {
             mStick.onTouch(event);
-            invalidate();
+        } else {
+            StickerManager.getInstance().clearAllFocus();
         }
+        invalidate();
         return true;
     }
 }

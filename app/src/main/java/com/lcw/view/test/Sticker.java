@@ -14,10 +14,10 @@ import android.view.MotionEvent;
  */
 public class Sticker extends BaseSticker {
 
-    protected PointF mLastSinglePoint = new PointF();//记录上一次单指触摸屏幕的点坐标
-    protected PointF mLastDistanceVector = new PointF();//记录上一次双指之间的向量
-    protected PointF mDistanceVector = new PointF();//记录当前双指之间的向量
-    protected float mLastDistance;//记录上一次双指之间的距离
+    private PointF mLastSinglePoint = new PointF();//记录上一次单指触摸屏幕的点坐标
+    private PointF mLastDistanceVector = new PointF();//记录上一次双指之间的向量
+    private PointF mDistanceVector = new PointF();//记录当前双指之间的向量
+    private float mLastDistance;//记录上一次双指之间的距离
 
     //记录点坐标，减少对象在onTouch中的创建
     private PointF mFirstPoint = new PointF();
@@ -28,53 +28,13 @@ public class Sticker extends BaseSticker {
     }
 
     /**
-     * 平移操作
-     *
-     * @param dx
-     * @param dy
-     */
-    @Override
-    public void translate(float dx, float dy) {
-        matrix.postTranslate(dx, dy);
-        updatePoints();
-    }
-
-    /**
-     * 缩放操作
-     *
-     * @param sx
-     * @param sy
-     * @param px
-     * @param py
-     */
-    @Override
-    public void scale(float sx, float sy, float px, float py) {
-        matrix.postScale(sx, sy, px, py);
-        updatePoints();
-    }
-
-    /**
-     * 旋转操作
-     *
-     * @param degrees
-     * @param px
-     * @param py
-     */
-    @Override
-    public void rotate(float degrees, float px, float py) {
-        matrix.postRotate(degrees, px, py);
-        updatePoints();
-    }
-
-    /**
      * 重置状态
      */
     public void reset() {
-        mLastDistance = 0f;
         mLastSinglePoint.set(0f, 0f);
         mLastDistanceVector.set(0f, 0f);
         mDistanceVector.set(0f, 0f);
-        mMidPointF.set(0f, 0f);
+        mLastDistance = 0f;
         mMode = MODE_NONE;
     }
 
@@ -101,16 +61,6 @@ public class Sticker extends BaseSticker {
         return (float) Math.toDegrees(currentDegrees - lastDegrees);
     }
 
-    /**
-     * 当矩阵发生变化的时候，更新坐标点（src坐标点经过matrix映射变成了dst坐标点）
-     */
-    private void updatePoints() {
-        //更新贴纸点坐标
-        matrix.mapPoints(mDstPoints, mSrcPoints);
-        //更新贴纸中心点坐标
-        mMidPointF.set(mDstPoints[8], mDstPoints[9]);
-    }
-
 
     /**
      * 处理触摸事件
@@ -121,7 +71,6 @@ public class Sticker extends BaseSticker {
     public void onTouch(MotionEvent event) {
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                // TODO: 2019/2/6 需要处理层级关系，不然当贴纸重叠的时候会出现bug
                 StickerManager.getInstance().setFocusSticker(this);
                 //有触摸到贴纸
                 mMode = Sticker.MODE_SINGLE;
@@ -145,7 +94,6 @@ public class Sticker extends BaseSticker {
                     translate(event.getX() - mLastSinglePoint.x, event.getY() - mLastSinglePoint.y);
                     mLastSinglePoint.set(event.getX(), event.getY());
                 }
-
                 if (mMode == MODE_MULTIPLE && event.getPointerCount() == 2) {
                     //记录双指的点位置
                     mFirstPoint.set(event.getX(0), event.getY(0));
@@ -154,11 +102,11 @@ public class Sticker extends BaseSticker {
                     float distance = calculateDistance(mFirstPoint, mSecondPoint);
                     //根据双指移动的距离获取缩放因子
                     float scale = distance / mLastDistance;
-                    scale(scale, scale, mMidPointF.x, mMidPointF.y);
+                    scale(scale, scale);
                     mLastDistance = distance;
                     //操作自由旋转
                     mDistanceVector.set(mFirstPoint.x - mSecondPoint.x, mFirstPoint.y - mSecondPoint.y);
-                    rotate(calculateDegrees(mLastDistanceVector, mDistanceVector), mMidPointF.x, mMidPointF.y);
+                    rotate(calculateDegrees(mLastDistanceVector, mDistanceVector));
                     mLastDistanceVector.set(mDistanceVector.x, mDistanceVector.y);
                 }
                 break;

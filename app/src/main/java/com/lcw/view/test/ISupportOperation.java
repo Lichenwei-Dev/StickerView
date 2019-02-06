@@ -2,6 +2,7 @@ package com.lcw.view.test;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.view.MotionEvent;
 
 /**
  * 贴纸的动作接口（支持拖动，缩放，旋转，绘制）
@@ -25,19 +26,15 @@ public interface ISupportOperation {
      *
      * @param sx
      * @param sy
-     * @param px
-     * @param py
      */
-    void scale(float sx, float sy, float px, float py);
+    void scale(float sx, float sy);
 
     /**
      * 旋转操作
      *
      * @param degrees
-     * @param px
-     * @param py
      */
-    void rotate(float degrees, float px, float py);
+    void rotate(float degrees);
 
 
     /**
@@ -47,5 +44,12 @@ public interface ISupportOperation {
      * @param paint
      */
     void onDraw(Canvas canvas, Paint paint);
+
+    /**
+     * 触摸操作
+     *
+     * @param event
+     */
+    void onTouch(MotionEvent event);
 
 }
