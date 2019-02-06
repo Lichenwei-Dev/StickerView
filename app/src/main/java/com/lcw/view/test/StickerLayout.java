@@ -7,17 +7,14 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.TabHost;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
 
 /**
- * 贴纸布局
+ * 贴纸布局（管理分发各种贴纸处理事件）
  * Create by: chenWei.li
  * Date: 2019/2/3
  * Time: 6:57 PM
@@ -26,17 +23,10 @@ import java.util.List;
 public class StickerLayout extends View implements View.OnTouchListener {
 
     private Context mContext;
-
-    //画笔
     private Paint mPaint;
 
     //记录当前操作的贴纸对象
     private Sticker mStick;
-
-    //记录点坐标，减少对象在onTouch中的创建
-    private PointF mFirstPoint = new PointF();
-    private PointF mSecondPoint = new PointF();
-
 
     public StickerLayout(Context context) {
         super(context);
@@ -60,7 +50,8 @@ public class StickerLayout extends View implements View.OnTouchListener {
         this.mContext = context;
         //初始化画笔
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mPaint.setColor(Color.GRAY);
+        mPaint.setColor(Color.BLUE);
+        mPaint.setStrokeWidth(8);
         //设置触摸监听
         setOnTouchListener(this);
     }
@@ -81,13 +72,15 @@ public class StickerLayout extends View implements View.OnTouchListener {
     }
 
     /**
-     * 移除贴纸
+     * 移除贴纸（只有在贴纸聚焦的时候才可以删除，避免误触碰）
      *
      * @param sticker
      */
     public void removeSticker(Sticker sticker) {
-        StickerManager.getInstance().removeSticker(sticker);
-        invalidate();
+        if (sticker.isFocus) {
+            StickerManager.getInstance().removeSticker(sticker);
+            invalidate();
+        }
     }
 
     /**
@@ -97,6 +90,7 @@ public class StickerLayout extends View implements View.OnTouchListener {
         StickerManager.getInstance().removeAllSticker();
         invalidate();
     }
+
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -110,70 +104,29 @@ public class StickerLayout extends View implements View.OnTouchListener {
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        int action = event.getAction();
-        switch (action & MotionEvent.ACTION_MASK) {
+        switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_POINTER_DOWN:
+                //判断是否按到删除按钮
                 mStick = StickerManager.getInstance().getDelButton(event.getX(), event.getY());
                 if (mStick != null) {
                     removeSticker(mStick);
                     mStick = null;
                 }
+                //单指是否触摸到贴纸
                 mStick = StickerManager.getInstance().getSticker(event.getX(), event.getY());
-                if (mStick != null) {
-                    //有触摸到贴纸
-                    mStick.setMode(Sticker.MODE_SINGLE);
-                    mStick.mLastSinglePoint.set(event.getX(), event.getY());
-                }
-                break;
-            case MotionEvent.ACTION_POINTER_DOWN:
-                if (event.getPointerCount() == 2) {
-                    if (mStick == null) {
+                if (mStick == null) {
+                    if (event.getPointerCount() == 2) {
                         //处理双指触摸屏幕，第一指没有触摸到贴纸，第二指触摸到贴纸情况
                         mStick = StickerManager.getInstance().getSticker(event.getX(1), event.getY(1));
                     }
-                    if (mStick != null) {
-                        mStick.setMode(Sticker.MODE_MULTIPLE);
-                        //记录双指的点位置
-                        mFirstPoint.set(event.getX(0), event.getY(0));
-                        mSecondPoint.set(event.getX(1), event.getY(1));
-                        //计算双指之间向量
-                        mStick.mLastDistanceVector.set(mFirstPoint.x - mSecondPoint.x, mFirstPoint.y - mSecondPoint.y);
-                        //计算双指之间距离
-                        mStick.mLastDistance = mStick.calculateDistance(mFirstPoint, mSecondPoint);
-                    }
                 }
                 break;
-            case MotionEvent.ACTION_MOVE:
-                if (mStick != null) {
-                    if (mStick.getMode() == Sticker.MODE_SINGLE) {
-                        mStick.translate(event.getX() - mStick.mLastSinglePoint.x, event.getY() - mStick.mLastSinglePoint.y);
-                        mStick.mLastSinglePoint.set(event.getX(), event.getY());
-                    }
-
-                    if (mStick.getMode() == Sticker.MODE_MULTIPLE && event.getPointerCount() == 2) {
-                        //记录双指的点位置
-                        mFirstPoint.set(event.getX(0), event.getY(0));
-                        mSecondPoint.set(event.getX(1), event.getY(1));
-                        //操作自由缩放
-                        float distance = mStick.calculateDistance(mFirstPoint, mSecondPoint);
-                        //根据双指移动的距离获取缩放因子
-                        float scale = distance / mStick.mLastDistance;
-                        mStick.scale(scale, scale, mStick.getMidPoint().x, mStick.getMidPoint().y);
-                        mStick.mLastDistance = distance;
-                        //操作自由旋转
-                        mStick.mDistanceVector.set(mFirstPoint.x - mSecondPoint.x, mFirstPoint.y - mSecondPoint.y);
-                        mStick.rotate(mStick.calculateDegrees(mStick.mLastDistanceVector, mStick.mDistanceVector), mStick.getMidPoint().x, mStick.getMidPoint().y);
-                        mStick.mLastDistanceVector.set(mStick.mDistanceVector.x, mStick.mDistanceVector.y);
-                    }
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-                if (mStick != null) {
-                    mStick.reset();
-                }
+            default:
                 break;
         }
         if (mStick != null) {
+            mStick.onTouch(event);
             invalidate();
         }
         return true;

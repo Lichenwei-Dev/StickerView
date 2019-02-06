@@ -38,6 +38,11 @@ public class StickerManager {
         return mStickerList;
     }
 
+    /**
+     * 移除指定贴纸
+     *
+     * @param sticker
+     */
     public void removeSticker(Sticker sticker) {
         Bitmap bitmap = sticker.getBitmap();
         if (bitmap != null && bitmap.isRecycled()) {
@@ -47,6 +52,9 @@ public class StickerManager {
 
     }
 
+    /**
+     * 移除所有贴纸
+     */
     public void removeAllSticker() {
         for (int i = 0; i < mStickerList.size(); i++) {
             Bitmap bitmap = mStickerList.get(i).getBitmap();
@@ -55,6 +63,22 @@ public class StickerManager {
             }
         }
         mStickerList.clear();
+    }
+
+    /**
+     * 设置当前贴纸为聚焦贴纸
+     *
+     * @param focusSticker
+     */
+    public void setFocusSticker(Sticker focusSticker) {
+        for (int i = 0; i < mStickerList.size(); i++) {
+            Sticker sticker = mStickerList.get(i);
+            if (sticker == focusSticker) {
+                sticker.isFocus = true;
+            } else {
+                sticker.isFocus = false;
+            }
+        }
     }
 
     /**
@@ -82,7 +106,7 @@ public class StickerManager {
     }
 
     /**
-     * 根据触摸坐标返回当前触摸的贴纸(是否触摸到删除按钮)
+     * 根据触摸是否触摸到删除按钮，返回对应删除按钮的贴纸
      *
      * @param x
      * @param y
