@@ -11,7 +11,7 @@
         android:scaleType="centerCrop"
         android:src="@mipmap/background" />
 
-    <com.lcw.view.test.StickerLayout
+    <com.lcw.library.stickerview.StickerLayout
         android:id="@+id/sl_sticker_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

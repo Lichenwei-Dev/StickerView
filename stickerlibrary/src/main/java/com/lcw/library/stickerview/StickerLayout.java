@@ -1,10 +1,9 @@
-package com.lcw.view.test;
+package com.lcw.library.stickerview;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -32,12 +31,12 @@ public class StickerLayout extends View implements View.OnTouchListener {
         init(context);
     }
 
-    public StickerLayout(Context context, @Nullable AttributeSet attrs) {
+    public StickerLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
-    public StickerLayout(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public StickerLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }

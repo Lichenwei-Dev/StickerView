@@ -5,8 +5,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-import com.lcw.view.test.Sticker;
-import com.lcw.view.test.StickerLayout;
+import com.lcw.library.stickerview.Sticker;
+import com.lcw.library.stickerview.StickerLayout;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.iv_sticker_02).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Sticker sticker = new Sticker(MainActivity.this,BitmapFactory.decodeResource(MainActivity.this.getResources(), R.mipmap.sticker_02));
+                Sticker sticker = new Sticker(MainActivity.this, BitmapFactory.decodeResource(MainActivity.this.getResources(), R.mipmap.sticker_02));
                 mStickerLayout.addSticker(sticker);
             }
         });
@@ -39,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.iv_sticker_03).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Sticker sticker = new Sticker(MainActivity.this,BitmapFactory.decodeResource(MainActivity.this.getResources(), R.mipmap.sticker_03));
+                Sticker sticker = new Sticker(MainActivity.this, BitmapFactory.decodeResource(MainActivity.this.getResources(), R.mipmap.sticker_03));
                 mStickerLayout.addSticker(sticker);
             }
         });
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.iv_sticker_04).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Sticker sticker = new Sticker(MainActivity.this,BitmapFactory.decodeResource(MainActivity.this.getResources(), R.mipmap.sticker_04));
+                Sticker sticker = new Sticker(MainActivity.this, BitmapFactory.decodeResource(MainActivity.this.getResources(), R.mipmap.sticker_04));
                 mStickerLayout.addSticker(sticker);
             }
         });

@@ -1,4 +1,4 @@
-package com.lcw.view.test;
+package com.lcw.library.stickerview;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;

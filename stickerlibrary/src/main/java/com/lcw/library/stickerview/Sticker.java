@@ -1,4 +1,4 @@
-package com.lcw.view.test;
+package com.lcw.library.stickerview;
 
 import android.content.Context;
 import android.graphics.Bitmap;
