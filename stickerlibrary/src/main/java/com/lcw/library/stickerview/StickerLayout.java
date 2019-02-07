@@ -105,9 +105,17 @@ public class StickerLayout extends View implements View.OnTouchListener {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         List<Sticker> stickerList = StickerManager.getInstance().getStickerList();
+        Sticker focusSticker = null;
         for (int i = 0; i < stickerList.size(); i++) {
             Sticker sticker = stickerList.get(i);
-            sticker.onDraw(canvas, getPaint());
+            if (sticker.isFocus()) {
+                focusSticker = sticker;
+            } else {
+                sticker.onDraw(canvas, getPaint());
+            }
+        }
+        if (focusSticker != null) {
+            focusSticker.onDraw(canvas, getPaint());
         }
     }
 
