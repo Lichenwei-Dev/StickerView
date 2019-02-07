@@ -6,11 +6,7 @@
 1、如何在项目中引入该贴纸库：
 
 ```
-//gradle版本在3.0以下引入此行
-compile 'com.lcw.library:StickeView:1.0.0'
-
-//gradle版本在3.0以上引入此行
-implementation 'com.lcw.library:StickeView:1.0.0'
+compile 'com.lcw.library:StickeView:1.0.1'
 ```
 
 2、布局设置：
