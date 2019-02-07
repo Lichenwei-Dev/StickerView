@@ -6,9 +6,8 @@ android {
         applicationId "com.lcw.view"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        versionCode 100
+        versionName "1.0.0"
     }
     buildTypes {
         release {
@@ -16,10 +15,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation project(':stickerlibrary')
+//    implementation project(':stickerlibrary')
+    implementation 'com.lcw.library:StickeView:1.0.0'
+
 }

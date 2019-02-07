@@ -125,6 +125,7 @@ public class StickerLayout extends View implements View.OnTouchListener {
                 break;
         }
         if (mStick != null) {
+            StickerManager.getInstance().setFocusSticker(mStick);
             mStick.onTouch(event);
         } else {
             StickerManager.getInstance().clearAllFocus();

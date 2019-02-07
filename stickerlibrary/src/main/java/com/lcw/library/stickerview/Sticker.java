@@ -66,12 +66,10 @@ public class Sticker extends BaseSticker {
      * 处理触摸事件
      *
      * @param event
-     * @return
      */
     public void onTouch(MotionEvent event) {
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                StickerManager.getInstance().setFocusSticker(this);
                 //有触摸到贴纸
                 mMode = Sticker.MODE_SINGLE;
                 //记录按下的位置
