@@ -24,7 +24,5 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:27.1.1'
-//    implementation project(':stickerlibrary')
-    implementation 'com.lcw.library:StickeView:1.0.0'
-
+    implementation project(':stickerlibrary')
 }

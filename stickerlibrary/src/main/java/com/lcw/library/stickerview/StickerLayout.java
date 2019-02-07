@@ -46,13 +46,23 @@ public class StickerLayout extends View implements View.OnTouchListener {
      */
     private void init(Context context) {
         this.mContext = context;
-        //初始化画笔
-        mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mPaint.setColor(Color.BLUE);
-        mPaint.setStrokeWidth(8);
         //设置触摸监听
         setOnTouchListener(this);
     }
+
+    public Paint getPaint() {
+        if (mPaint == null) {
+            mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            mPaint.setColor(Color.BLACK);
+            mPaint.setStrokeWidth(2);
+        }
+        return mPaint;
+    }
+
+    public void setPaint(Paint mPaint) {
+        this.mPaint = mPaint;
+    }
+
 
     /**
      * 添加贴纸
@@ -97,7 +107,7 @@ public class StickerLayout extends View implements View.OnTouchListener {
         List<Sticker> stickerList = StickerManager.getInstance().getStickerList();
         for (int i = 0; i < stickerList.size(); i++) {
             Sticker sticker = stickerList.get(i);
-            sticker.onDraw(canvas, mPaint);
+            sticker.onDraw(canvas, getPaint());
         }
     }
 
@@ -120,12 +130,14 @@ public class StickerLayout extends View implements View.OnTouchListener {
                         mStick = StickerManager.getInstance().getSticker(event.getX(1), event.getY(1));
                     }
                 }
+                if (mStick != null) {
+                    StickerManager.getInstance().setFocusSticker(mStick);
+                }
                 break;
             default:
                 break;
         }
         if (mStick != null) {
-            StickerManager.getInstance().setFocusSticker(mStick);
             mStick.onTouch(event);
         } else {
             StickerManager.getInstance().clearAllFocus();

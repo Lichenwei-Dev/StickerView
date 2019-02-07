@@ -5,7 +5,7 @@ import android.graphics.Paint;
 import android.view.MotionEvent;
 
 /**
- * 贴纸的动作接口（支持拖动，缩放，旋转，绘制）
+ * 贴纸的动作接口（支持拖动，缩放，旋转，绘制，触摸）
  * Create by: chenWei.li
  * Date: 2019/2/4
  * Time: 12:58 AM
